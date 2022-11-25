@@ -41,7 +41,7 @@ def restore_pyr_crop(img: np.array, original_shape: tuple) -> np.array:
     """
     oh, ow, _ = original_shape
     ih, iw, _ = img.shape
-    if oh == ih or ow == iw:
+    if oh == ih and ow == iw:
         return img
 
     # Zero pad and place cropped image in center
@@ -94,7 +94,8 @@ if __name__ == '__main__':
     args.train = False
 
     if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
+        os.makedirs(os.path.join(args.output_dir, "DeepHDR_gamma"))
+        os.makedirs(os.path.join(args.output_dir, "DeepHDR_h"))
 
     assert os.path.exists(args.weights_path), "Unable to find pretrained weights"
     model = SoftConvNotLearnedMaskUNet().to(args.device)
@@ -123,13 +124,14 @@ if __name__ == '__main__':
 
             # Transform model output and save
             out_h, out_gamma = visualize_model_output(in_img, in_mask, model_output)
+
             padded_h = restore_pyr_crop(out_h, image.shape)
             padded_gamma = restore_pyr_crop(out_gamma, image.shape)
 
-            new_name = os.path.splitext(os.path.basename(img_path))[0] + "_h.hdr"
-            output_path = os.path.join(args.output_dir, new_name)
+            new_name = os.path.splitext(os.path.basename(img_path))[0] + ".hdr"
+            output_path = os.path.join(args.output_dir, "DeepHDR_h", new_name)
             cv2.imwrite(output_path, padded_h)
 
-            new_name = os.path.splitext(os.path.basename(img_path))[0] + "_gamma.hdr"
-            output_path = os.path.join(args.output_dir, new_name)
+            new_name = os.path.splitext(os.path.basename(img_path))[0] + ".hdr"
+            output_path = os.path.join(args.output_dir, "DeepHDR_gamma", new_name)
             cv2.imwrite(output_path, padded_gamma)

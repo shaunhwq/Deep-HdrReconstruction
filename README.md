@@ -47,7 +47,7 @@ Running
 ```
 export LD_LIBRARY_PATH=/data2/shaun/cuda-10.0/lib64:$LD_LIBRARY_PATH
 export CUDA_VISIBLE_DEVICES=3
-python3 test_hdr_demo.py --input_dir path_to_input_folder --output_dir path_to_output_folder
+python3 deeo_hdr_demo.py --input_dir path_to_input_folder --output_dir path_to_output_folder
 ```
 
 - Note that this method outputs H and gamma in the same folder, need to do further manipulation to store in different folders if you want to compare with comparison tool
