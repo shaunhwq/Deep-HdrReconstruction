@@ -18,6 +18,7 @@ This codebase was developed and tested with PyTorch 1.2 and Python 3.6.
 - Pillow
 - pyexr
 - OpenEXR
+- scipy
 
 ```
 pip install -r requirements.txt
@@ -30,6 +31,26 @@ Download the repository
 ```
 https://github.com/marcelsan/Deep-HdrReconstruction.git
 ```
+
+### Testing (on external images, for cuda-10.0)
+
+Installation
+```
+conda create -n DeepHDR python=3.6
+conda activate DeepHDR
+conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
+pip3 install opencv-python tqdm scipy
+# Download pretrained model & store into ./checkpoints
+```
+
+Running
+```
+export LD_LIBRARY_PATH=/data2/shaun/cuda-10.0/lib64:$LD_LIBRARY_PATH
+export CUDA_VISIBLE_DEVICES=3
+python3 test_hdr_demo.py --input_dir path_to_input_folder --output_dir path_to_output_folder
+```
+
+- Note that this method outputs H and gamma in the same folder, need to do further manipulation to store in different folders if you want to compare with comparison tool
 
 ## Usage
 
