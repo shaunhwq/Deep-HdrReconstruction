@@ -76,12 +76,12 @@ def visualize_model_output(img, mask, model_out):
 
     y_predict = np.exp(model_out) - 1
     gamma = np.power(img, 2)
+
+    # Paper describes why H is like this.
     H = mask * gamma + (1 - mask) * y_predict
-
     H = cv2.cvtColor(H, cv2.COLOR_RGB2BGR)
-    gamma = cv2.cvtColor(gamma, cv2.COLOR_RGB2BGR)
 
-    return H, gamma
+    return H
 
 
 if __name__ == '__main__':
@@ -94,8 +94,7 @@ if __name__ == '__main__':
     args.train = False
 
     if not os.path.exists(args.output_dir):
-        os.makedirs(os.path.join(args.output_dir, "DeepHDR_gamma"))
-        os.makedirs(os.path.join(args.output_dir, "DeepHDR_h"))
+        os.makedirs(args.output_dir)
 
     assert os.path.exists(args.weights_path), "Unable to find pretrained weights"
     model = SoftConvNotLearnedMaskUNet().to(args.device)
@@ -123,15 +122,9 @@ if __name__ == '__main__':
             model_output = model(in_img, in_mask)
 
             # Transform model output and save
-            out_h, out_gamma = visualize_model_output(in_img, in_mask, model_output)
-
+            out_h = visualize_model_output(in_img, in_mask, model_output)
             padded_h = restore_pyr_crop(out_h, image.shape)
-            padded_gamma = restore_pyr_crop(out_gamma, image.shape)
 
             new_name = os.path.splitext(os.path.basename(img_path))[0] + ".hdr"
-            output_path = os.path.join(args.output_dir, "DeepHDR_h", new_name)
+            output_path = os.path.join(args.output_dir, new_name)
             cv2.imwrite(output_path, padded_h)
-
-            new_name = os.path.splitext(os.path.basename(img_path))[0] + ".hdr"
-            output_path = os.path.join(args.output_dir, "DeepHDR_gamma", new_name)
-            cv2.imwrite(output_path, padded_gamma)
